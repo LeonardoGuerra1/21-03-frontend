@@ -29,6 +29,7 @@ export const usePlaylists = () => {
       const { data } = await api.post<ServiceResponse<Playlist>>(API_BASE_URL + "/playlist/create", { payload: item })
       if (data.ok) {
         queryClient.setQueryData([QUERY_KEYS.PLAYLIST_LIST], (oldData: Playlist[]) => {
+          if (!oldData) return []
           return [...oldData, data.data]
         })
       }
@@ -56,9 +57,21 @@ export const usePlaylists = () => {
     }
   }
 
-  const cleanPlaylist = async (id: string): Promise<ServiceResponse> => {
+  const cleanPlaylist = async (playlistId: string): Promise<ServiceResponse> => {
     try {
-      const { data } = await api.post<ServiceResponse>(API_BASE_URL + "/playlist/clean" + id, { id })
+      const { data } = await api.post<ServiceResponse>(API_BASE_URL + "/playlist/clean", { playlistId })
+      if (data.ok) {
+        queryClient.setQueryData([QUERY_KEYS.PLAYLIST_LIST], (oldData: Playlist[]) => {
+          if (!oldData) return []
+
+          const playlistIndex = oldData.findIndex(p => p._id === playlistId)
+          if (playlistIndex === -1) return [...oldData]
+
+          console.log("updated query data");
+          oldData[playlistIndex].items = []
+          return [...oldData]
+        })
+      }
       return data
     } catch (error) {
       return handleError(error)
@@ -69,7 +82,13 @@ export const usePlaylists = () => {
     try {
       const { data } = await api.post<ServiceResponse>(API_BASE_URL + "/playlist/add-item", { playlistId, item })
       if (data.ok) {
-        
+        queryClient.setQueryData([QUERY_KEYS.PLAYLIST_LIST], (oldData: Playlist[]) => {
+          const playlistIndex = oldData.findIndex(p => p._id === playlistId)
+          if (playlistIndex === -1) return [...oldData]
+
+          oldData[playlistIndex].items.push(item)
+          return [...oldData]
+        })
       }
       return data
     } catch (error) {
@@ -77,9 +96,21 @@ export const usePlaylists = () => {
     }
   }
 
-  const removeItemFromPlaylist = async (playlistId: string, itemId: string): Promise<ServiceResponse> => {
+  const removeItemFromPlaylist = async (playlistId: string, itemId: string, delay = 0): Promise<ServiceResponse> => {
     try {
       const { data } = await api.delete<ServiceResponse>(API_BASE_URL + "/playlist/remove-item?playlistId=" + playlistId + "&itemId=" + itemId)
+      if (data.ok) {
+        setTimeout(() => {
+          queryClient.setQueryData([QUERY_KEYS.PLAYLIST_LIST], (oldData: Playlist[]) => {
+            const index = oldData.findIndex(p => p._id === playlistId)
+            if (index === -1) return [...oldData]
+
+            const filtereds = oldData[index].items.filter(i => i.s_id !== itemId)
+            oldData[index].items = filtereds
+            return [...oldData]
+          })
+        }, delay);
+      }
       return data
     } catch (error) {
       return handleError(error)

@@ -2,6 +2,7 @@ export interface Playlist {
   _id?: string
   name: string
   items: PlaylistItem[]
+  createdAt?: Date
   // userId: number
 }
 

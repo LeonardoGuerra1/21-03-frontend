@@ -75,7 +75,7 @@ function PersonalInfo() {
 
         {render && (
           <div className={`w-60 ${show ? "scale-y-100" : "scale-y-0"} origin-top overflow-hidden duration-500`}>
-            <SubmitButton text="Update" disabled={isSubmitting} />
+            <SubmitButton text="Update" loading={isSubmitting} />
           </div>
         )}
       </form>

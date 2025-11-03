@@ -14,10 +14,17 @@ export const api = axios.create({
 })
 
 api.interceptors.response.use(res => res, async (error: AxiosError) => {
+  console.log({
+    from: "interceptor",
+    error
+  });
+
   if (error.status === UNAUTHORIZED) {
     const result = await api.post(API_BASE_URL + "/users/logout")
     if (result.data.ok) {
       openDialog(LOGOUT_ACTION)
     }
   }
+
+  return error.response
 })

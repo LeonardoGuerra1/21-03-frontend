@@ -16,14 +16,19 @@ function SignupDialog() {
   })
   const { signup } = useAccount()
   const [result, setResult] = useState<ServiceResponse | null>(null);
+  const [internal, setInternal] = useState(false);
   
   const onSubmit = async (data: SignupForm) => {
     const result = await signup(data)
     setResult(result)
+    
     if (result.ok) {
       setTimeout(() => {
         closeDialog()
       }, 1000);
+    } else {
+      if (result.internal !== null)
+        setInternal(true)
     }
   }
 
@@ -66,7 +71,11 @@ function SignupDialog() {
         </button>
 
         <div className="w-full">
-          <SubmitButton text="SIGNUP" disabled={isSubmitting} />
+          <SubmitButton
+            text="SIGNUP"
+            loading={isSubmitting}
+            internal={internal}
+          />
         </div>
       </form>
     </Dialog>

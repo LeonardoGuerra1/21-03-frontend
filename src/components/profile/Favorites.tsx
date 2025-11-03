@@ -10,10 +10,12 @@ function Favorites() {
     queryKey: [QUERY_KEYS.FAVORITE_TRACKS],
     queryFn: listFavoritesTracks,
   })
+  
   const { data: albums } = useSuspenseQuery({
     queryKey: [QUERY_KEYS.FAVORITE_ALBUMS],
     queryFn: listFavoritesAlbums,
   })
+  
   const { data: artists } = useSuspenseQuery({
     queryKey: [QUERY_KEYS.FAVORITE_ARTISTS],
     queryFn: listFavoritesArtists,

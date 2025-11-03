@@ -6,5 +6,6 @@ export interface Favorite {
   type: ItemType
   name: string
   image: string
+  createdAt?: string
   // userId: string
 }

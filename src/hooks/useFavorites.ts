@@ -28,7 +28,11 @@ export const useFavorites = () => {
         setTimeout(() => {
           const queryKey = getQueryKeyFromFavoriteType(type)
           queryClient.setQueryData([queryKey], (oldData: Favorite[]) => {
-            return oldData.filter(f => f.s_id !== id)
+            console.log(oldData);
+            const filtered = oldData.filter(f => f.s_id !== id)
+            console.log("===============================");
+            console.log(filtered);
+            return [...filtered]
           })
         }, delay);
       }
@@ -40,7 +44,7 @@ export const useFavorites = () => {
 
   const listFavoritesTracks = async (): Promise<Favorite[]> => {
     try {
-      const { data } = await api.get<ServiceResponse>(API_BASE_URL + "/favorites/list-tracks")
+      const { data } = await api.get<ServiceResponse<Favorite[]>>(API_BASE_URL + "/favorites/list-tracks")
       return data.data
     } catch (error) {
       throw new Error(error as any)
@@ -49,7 +53,7 @@ export const useFavorites = () => {
 
   const listFavoritesAlbums = async (): Promise<Favorite[]> => {
     try {
-      const { data } = await api.get<ServiceResponse>(API_BASE_URL + "/favorites/list-albums")
+      const { data } = await api.get<ServiceResponse<Favorite[]>>(API_BASE_URL + "/favorites/list-albums")
       return data.data
     } catch (error) {
       throw new Error(error as any)
@@ -58,7 +62,7 @@ export const useFavorites = () => {
 
   const listFavoritesArtists = async (): Promise<Favorite[]> => {
     try {
-      const { data } = await api.get<ServiceResponse>(API_BASE_URL + "/favorites/list-artists")
+      const { data } = await api.get<ServiceResponse<Favorite[]>>(API_BASE_URL + "/favorites/list-artists")
       return data.data
     } catch (error) {
       throw new Error(error as any)

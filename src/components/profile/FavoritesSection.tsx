@@ -1,8 +1,11 @@
 import { Favorite } from "../../models/Favorite";
 import deleteIcon from "../../assets/icons/delete.svg"
 import { useFavorites } from "../../hooks/useFavorites";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import Filter from "../utils/Filter";
+import Dropdown from "../utils/Dropdown";
+import { FAVORITES_OPTIONS, DropdownOption } from "../../constants";
 
 interface FavoritesSectionProps {
   title: string
@@ -10,27 +13,60 @@ interface FavoritesSectionProps {
 }
 
 function FavoritesSection({ title, list }: FavoritesSectionProps) {
+  const [olist, setOlist] = useState<Favorite[]>(list);
+  const filterCallback = useCallback((search: string) => {
+    setOlist(olist.filter(p => p.name.toLowerCase().includes(search.toLowerCase())))
+  }, [olist])
+
+  const sortCallback = useCallback((value: DropdownOption) => {
+    if (value.id === 0) {
+      setOlist([...list])
+      return
+    }
+
+    if (value.id === 1) olist.sort((a, b) => {
+      const firstDate = new Date(a.createdAt!)
+      const secondDate = new Date(b.createdAt!)
+      return firstDate.getTime() - secondDate.getTime()
+    })
+    setOlist([...olist])
+  }, [olist])
+
   return (
-    <div className="w-full my-10">
-      <span className="text-2xl font-semibold">
-        {title}
-      </span>
-      <hr className="border-white/50" />
-      {list.length > 0
-      ? (
-        <ul className="my-5 grid favorites-grid grid-flow-dense min-[750px]:grid-cols-2 min-[1430px]:grid-cols-3 gap-x-5">
-          {list.map(item =>
-            <FavoriteItem
-              key={item._id}
-              item={item}
-            />)}
-        </ul>
-      ) : (
-        <p className="text-lg mt-2 font-medium">
-          No favorites here
-        </p>
-      )}
-    </div>
+    <section className="w-full my-10">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold">
+          {title}
+        </h2>
+        <div className="flex justify-end items-center gap-x-3 divide-x-2 divide-white/30">
+          <Filter
+            placeholder="Filter by name"
+            onSearch={filterCallback}
+            onClear={() => setOlist([...list])}
+          />
+          <Dropdown
+             label="Order by"
+             onSelect={sortCallback}
+             options={FAVORITES_OPTIONS}
+          />
+        </div>
+      </div>
+      <hr className="border-white/50 mt-3" />
+      {olist.length > 0
+        ? (
+          <ul className="my-5 grid favorites-grid grid-flow-dense min-[750px]:grid-cols-2 min-[1430px]:grid-cols-3 gap-x-5">
+            {olist.map(item =>
+              <FavoriteItem
+                key={item._id}
+                item={item}
+              />)}
+          </ul>
+        ) : (
+          <p className="text-lg mt-2 font-medium">
+            No favorites here
+          </p>
+        )}
+    </section>
   );
 }
 
@@ -47,7 +83,7 @@ const FavoriteItem = ({ item }: ItemProps) => {
   const [fade, setFade] = useState(false);
   
   const handleDelete = async () => {
-    const result = await deleteItem(item.s_id, item.type, 500)
+    const result = await deleteItem(item.s_id, item.type, 300)
     if (result.ok && liRef.current !== null) {
       setFade(true)
     }

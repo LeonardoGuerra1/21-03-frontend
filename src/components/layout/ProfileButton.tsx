@@ -5,18 +5,17 @@ import { useDialogStore } from "../../stores/useDialogStore";
 import { useClickAway } from "../../hooks/useClickAway";
 import LoginDialog from "../auth/LoginDialog";
 import { useOpen } from "../../hooks/useOpen";
-import { Action, LOGGED_OPTIONS, LOGIN_ACTION, LOGOUT_ACTION, SIGNUP_ACTION, UNLOGGED_OPTIONS } from "../../constants";
+import { DialogAction, LOGGED_OPTIONS, LOGIN_ACTION, LOGOUT_ACTION, SIGNUP_ACTION, UNLOGGED_OPTIONS } from "../../constants";
 import SignupDialog from "../auth/SignupDialog";
 import { useAuthStore } from "../../stores/useAuthStore";
 import LogoutDialog from "../auth/LogoutDialog";
 
 function ProfileButton() {
   const [openMenu, setOpenMenu] = useState(false);
-  const [disabled, setDisabled] = useState(false);
 
   const action = useDialogStore().action
   const openDialog = useDialogStore().openDialog
-  const { render, show } = useOpen(openMenu)
+  const { render, show, clickable } = useOpen(openMenu)
   
   const logged = useAuthStore().logged
   const username = useAuthStore().username
@@ -27,13 +26,7 @@ function ProfileButton() {
     return clean
   }, []);
 
-  const handleButton = () => {
-    setDisabled(true)
-    setOpenMenu(prev => !prev)
-    setTimeout(() => setDisabled(false), 500);
-  }
-
-  const handleSelect = (newAction: Action) => {
+  const handleSelect = (newAction: DialogAction) => {
     openDialog(newAction)
     setOpenMenu(false)
   }
@@ -42,8 +35,8 @@ function ProfileButton() {
     <div className="relative">
       <button
         className="px-2 h-11 rounded-full cursor-pointer flex justify-center items-center hover:bg-white/10"
-        onClick={handleButton} 
-        disabled={disabled}
+        onClick={() => setOpenMenu(prev => !prev)} 
+        disabled={!clickable}
       >
         {logged && (
           <span className="italic">
@@ -77,7 +70,7 @@ function ProfileButton() {
 export default ProfileButton;
 
 interface OptionsProps {
-  onSelect: (action: Action) => void
+  onSelect: (action: DialogAction) => void
 }
 
 const UnloggedOptions = ({ onSelect }: OptionsProps) => {
@@ -95,7 +88,7 @@ const UnloggedOptions = ({ onSelect }: OptionsProps) => {
 
 const LoggedOptions = ({ onSelect }: OptionsProps) => {
   const navigate = useNavigate()
-  const handleSelect = (action: Action, path?: string | null) => {
+  const handleSelect = (action: DialogAction, path?: string | null) => {
     onSelect(action)
     if (path !== null)
       navigate(path!)

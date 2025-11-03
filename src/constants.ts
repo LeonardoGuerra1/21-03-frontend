@@ -6,6 +6,7 @@ export const UNAUTHORIZED = 401
 
 export interface ServiceResponse<D = any> {
   ok: boolean
+  internal?: boolean
   message: string
   data: D
 }
@@ -54,13 +55,20 @@ export type ItemType = "track" | "album" | "artist"
 
 //===================================================================================================================================
 //===================================================================================================================================
-// AUTH
+// DIALOG
 
-export type Action = { type: "login" | "signup" | "playlist" | "logout" | null, id?: string }
-export const LOGIN_ACTION: Action = { type: "login" }
-export const SIGNUP_ACTION: Action = { type: "signup" }
-export const LOGOUT_ACTION: Action = { type: "logout" }
-export const NULL_ACTION: Action = { type: null }
+export type DialogAction = {
+  type: "login" | "signup" | "playlist" | "detail-playlist" | "logout" | null
+  id?: string
+}
+export const LOGIN_ACTION: DialogAction = { type: "login" }
+export const SIGNUP_ACTION: DialogAction = { type: "signup" }
+export const LOGOUT_ACTION: DialogAction = { type: "logout" }
+export const NULL_ACTION: DialogAction = { type: null }
+
+//===================================================================================================================================
+//===================================================================================================================================
+// AUTH
 
 export const UNLOGGED_OPTIONS = [
   {
@@ -280,4 +288,35 @@ export const SECURITY_FIELDS = [
     type: "password",
     conditional: true
   }
+]
+
+export interface DropdownOption {
+  id: number
+  label: string
+}
+
+export const FAVORITES_OPTIONS: DropdownOption[] = [
+  {
+    id: 0,
+    label: "..."
+  },
+  {
+    id: 1,
+    label: "Date added"
+  }
+]
+
+export const PLAYLISTS_OPTIONS: DropdownOption[] = [
+  {
+    id: 0,
+    label: "..."
+  },
+  {
+    id: 1,
+    label: "Amount of items"
+  },
+  {
+    id: 2,
+    label: "Date created"
+  },
 ]

@@ -13,6 +13,9 @@ export const ROUTER = {
       TRANSACTIONS: "transactions",
     }
   },
+  ABOUT: {
+    path: "/about"
+  },
   CART: {
     path: "/cart",
     sub: {
@@ -29,4 +32,7 @@ export const ROUTER = {
   ARTIST: {
     path: "/artist"
   },
+  PLAYLIST: {
+    path: "/playlist"
+  }
 }

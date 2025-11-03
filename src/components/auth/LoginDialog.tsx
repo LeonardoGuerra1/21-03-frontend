@@ -11,18 +11,23 @@ function LoginDialog() {
   const changeAction = useDialogStore().changeAction
   const closeDialog = useDialogStore().closeDialog
 
-  const { register, formState: { errors, isSubmitting }, handleSubmit } =
+  const { register, formState: { errors, isSubmitting, isSubmitSuccessful }, handleSubmit } =
   useForm<LoginForm>({
     defaultValues: LOGIN_DEFAULT
   })
   const { login } = useAccount()
   const [result, setResult] = useState<ServiceResponse | null>(null);
+  const [internal, setInternal] = useState(false);
 
   const onSubmit = async (data: LoginForm) => {
     const result = await login(data.email, data.password)
     setResult(result)
+
     if (result.ok) {
       setTimeout(() => closeDialog(), 1000);
+    } else {
+      if (result.internal !== undefined)
+        setInternal(true)
     }
   }
 
@@ -53,7 +58,7 @@ function LoginDialog() {
         <button
           type="button"
           className="mx-auto mb-2 flex justify-center items-center gap-x-2 cursor-pointer"
-          disabled={isSubmitting}
+          disabled={isSubmitting || isSubmitSuccessful}
           onClick={() => changeAction(SIGNUP_ACTION)}
         >
           <span className="text-white/50 hover:text-white/70 duration-100">
@@ -65,7 +70,11 @@ function LoginDialog() {
         </button>
 
         <div className="w-full">
-          <SubmitButton text="LOGIN" disabled={isSubmitting} />
+          <SubmitButton
+            text="LOGIN"
+            loading={isSubmitting}
+            internal={internal}
+          />
         </div>
       </form>
     </Dialog>

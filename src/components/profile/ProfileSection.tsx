@@ -20,9 +20,9 @@ function ProfileSection() {
 
       <hr className="my-7 pl-10 rounded-r border-2 border-white/30" />
 
-      <div className="m-10">
+      <section className="m-10">
         <Outlet />
-      </div>
+      </section>
     </div>
   );
 }

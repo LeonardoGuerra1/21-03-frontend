@@ -1,16 +1,15 @@
 import { create } from "zustand";
-import { Action } from "../constants";
-
+import { DialogAction } from "../constants";
 
 type DialogStoreState = {
   open: boolean
-  action: Action
+  action: DialogAction
 }
 
 type DialogStoreActions = {
-  openDialog: (action: Action) => void
+  openDialog: (action: DialogAction) => void
   closeDialog: () => void
-  changeAction: (action: Action) => void
+  changeAction: (action: DialogAction) => void
 }
 
 type DialogStore = DialogStoreState & DialogStoreActions

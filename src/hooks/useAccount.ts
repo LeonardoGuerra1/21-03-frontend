@@ -31,7 +31,8 @@ export const useAccount = () => {
 
   const login = async (email: string, password: string): Promise<ServiceResponse> => {
     try {
-      const { data } = await api.post<ServiceResponse>(API_BASE_URL + "/users/login", { email, password })
+      const res = await api.post<ServiceResponse>(API_BASE_URL + "/users/login", { email, password })
+      const { data } = res
       if (data.ok) setAccount(data.data.username)
       return data
     } catch (error) {

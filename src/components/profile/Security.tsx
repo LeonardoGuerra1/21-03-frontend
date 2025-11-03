@@ -144,7 +144,7 @@ function Security() {
         
         {(renderEmail || renderPassword) && (
           <div className={`w-60 ${(showEmail || showPassword) ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0"} origin-top overflow-hidden duration-300`}>
-            <SubmitButton text="Change" disabled={isSubmitting} />
+            <SubmitButton text="Change" loading={isSubmitting} />
           </div>
         )}
 

@@ -11,17 +11,10 @@ import { useOpen } from "../../hooks/useOpen";
 
 function NavCartButton() {
   const [openCart, setOpenCart] = useState(false);
-  const [disabled, setDisabled] = useState(false);
-  const { render, show } = useOpen(openCart)
+  const { render, show, clickable } = useOpen(openCart)
   
   const cart = useCartStore().list
   const resume = useMemo(() => cart.reduce((a, b) => a + (b.quantity * b.item.price), 0), [cart])
-
-  const handleButton = () => {
-    setDisabled(true)
-    setOpenCart(prev => !prev)
-    setTimeout(() => setDisabled(false), 500);
-  }
 
   useEffect(() => {
     if (cart.length === 0) setOpenCart(false)
@@ -37,8 +30,8 @@ function NavCartButton() {
     <div className="relative">
       <button
         className="px-2 h-11 rounded-full cursor-pointer flex justify-center items-center hover:bg-white/10 disabled:opacity-60"
-        disabled={cart.length === 0 || disabled}
-        onClick={handleButton}
+        disabled={cart.length === 0 || !clickable}
+        onClick={() => setOpenCart(prev => !prev)}
       >
         <img
           src={cartIcon}

@@ -6,6 +6,7 @@ import { ROUTER } from "../../router";
 
 interface AlbumCardProps {
   album: Album
+  isFavorite?: boolean
 }
 
 function AlbumCard({ album }: AlbumCardProps) {

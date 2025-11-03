@@ -12,6 +12,7 @@ import { useAuthStore } from "./stores/useAuthStore";
 import SafeComponent from "./components/utils/SafeComponent";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "./constants";
+import AboutPage from "./pages/AboutPage";
 
 const HomePage = lazy(() => import("./pages/HomePage"))
 const DetailedTrackPage = lazy(() => import("./pages/DetailedTrackPage"))
@@ -40,6 +41,8 @@ function App() {
 
         <Routes>
           <Route path={ROUTER.INDEX.path} index element={<HomePage />} />
+          <Route path={ROUTER.ABOUT.path} index element={<AboutPage />} />
+
 
           <Route path="/track/:id" element={<DetailedTrackPage />} />
 

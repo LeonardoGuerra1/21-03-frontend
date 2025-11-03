@@ -21,7 +21,7 @@ function Navbar() {
         </span>
       </Link>
 
-      {/* <Searcher /> */}
+      <Searcher />
       
       <div className="flex justify-center items-center">
         <NavCartButton />

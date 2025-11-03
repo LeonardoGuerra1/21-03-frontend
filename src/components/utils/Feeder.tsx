@@ -8,10 +8,10 @@ const NEUTRAL_BG = "bg-neutral-600/90"
 const SUCCESS_BG = "bg-green-600/90"
 const ERROR_BG = "bg-red-700/90"
 
-const MESSAGE_STYLES = "w-25 h-9 left-[-38px]"
-const ICON_STYLES = "w-11 h-12 left-[-10px]"
-const TOP_POSITION_STYLES = "bottom-[110%]"
-const BOTTOM_POSITION_STYLES = "top-[110%]"
+const MESSAGE_STYLES = "w-25 h-9"
+const ICON_STYLES = "w-11 h-12"
+const SET_TOP = "bottom-[110%]"
+const SET_BOTTOM = "top-[110%]"
 
 interface FeederProps {
   open: boolean
@@ -30,7 +30,7 @@ function Feeder({ open, status, position }: FeederProps) {
   const showMessage = status === FEEDER_STATUS.MESSAGE
 
   return render ? (
-    <div className={`absolute ${showMessage ? MESSAGE_STYLES : ICON_STYLES} ${position === "top" ? TOP_POSITION_STYLES : BOTTOM_POSITION_STYLES} rounded-2xl flex justify-center items-center pointer-events-none ${statusObject.bg} ${show ? "scale-100 opacity-100" : "scale-50 opacity-0"} duration-200`}>
+    <div className={`absolute left-[50%] translate-x-[-50%] ${showMessage ? MESSAGE_STYLES : ICON_STYLES} ${position === "top" ? SET_TOP : SET_BOTTOM} rounded-2xl flex justify-center items-center pointer-events-none ${statusObject.bg} ${show ? "scale-100 opacity-100" : "scale-50 opacity-0"} duration-200`}>
       {showMessage ? (
         <span className="text-sm">
           Log in first!

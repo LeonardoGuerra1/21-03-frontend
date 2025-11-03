@@ -1,6 +1,6 @@
 import { RefObject } from "react"
 
-type ContainsElement = HTMLDivElement | HTMLUListElement
+type ContainsElement = HTMLDivElement | HTMLUListElement | HTMLButtonElement
 
 export const useClickAway = <T>(ref: RefObject<T | null>, callback: () => void) => {
   const handleClickAway = (e: MouseEvent) => {

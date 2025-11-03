@@ -11,7 +11,8 @@ function AlbumList() {
     queryFn: getAlbums
   })
 
-  return albums.map(album => <AlbumCard key={album.s_id} album={album} />)
+  return albums.map(album => <AlbumCard key={album.s_id} album={album} />
+  )
 }
 
 export default AlbumList;

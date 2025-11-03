@@ -3,13 +3,13 @@ import { Track } from "../../models/Track";
 import FavoriteButton from "../item/FavoriteButton";
 import PlaylistButton from "../item/PlaylistButton";
 import { ROUTER } from "../../router";
+import SafeComponent from "../utils/SafeComponent";
 
 interface TrackRowProps {
   track: Track
-  isFavorite?: boolean
 }
 
-function TrackRow({ track, isFavorite }: TrackRowProps) {
+function TrackRow({ track }: TrackRowProps) {
   return (
     <li className="max-2-cards:w-[287px] mx-auto w-full min-2-cards:h-20 rounded ring-3 ring-white/20 hover:ring-white/40 bg-black/40 duration-75 flex max-2-cards:flex-col justify-start items-center gap-x-5">
       <Link to={`${ROUTER.TRACK.path}/${track.s_id}`} className="h-full">
@@ -25,7 +25,12 @@ function TrackRow({ track, isFavorite }: TrackRowProps) {
         </Link>
       </span>
       <div className="p-2 h-full hover:bg-neutral-600/30 flex justify-center items-center gap-3">
-        <FavoriteButton item={track} initial={isFavorite} feederPosition="top" />
+        <SafeComponent key={"favorite-" + track.s_id} errorMessage="." loadingSize="small">
+          <FavoriteButton
+            item={track}
+            feederPosition="top"
+          />
+        </SafeComponent>
         <PlaylistButton item={track} />
       </div>
     </li>

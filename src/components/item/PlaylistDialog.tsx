@@ -7,7 +7,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "../../constants";
 import { usePlaylists } from "../../hooks/usePlaylists";
 import SafeComponent from "../utils/SafeComponent";
-
+import Input from "../utils/Input";
 
 interface PlaylistDialogProps {
   item: Track
@@ -18,6 +18,7 @@ function PlaylistDialog({ item }: PlaylistDialogProps) {
 
   const [input, setInput] = useState("");
   const [inputError, setInputError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   
   const open = useDialogStore().open
   const action = useDialogStore().action
@@ -25,30 +26,34 @@ function PlaylistDialog({ item }: PlaylistDialogProps) {
 
   useEffect(() => {
     if (!open && action.type === "playlist") {
-      //ANIMATION FOR INPUT
+      //DELAY FOR INPUT ANIMATION
       setInputError(false)
       setTimeout(() => setInput(""), 500);
     }
   }, [open, action]);
-  
-  useEffect(() => {
-    if (input.length > 0) 
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length > 0) 
       setInputError(false)
-  }, [input]);
+    setInput(e.target.value)
+  }
 
   const handleCreate = async () => {
-    if (input.length < 1) {
+    setErrorMessage("")
+    if (input.length === 0 || inputError) {
       setInputError(true)
       return
     }
 
     const result = await createPlaylist({
       name: input,
-      items: [{
-        s_id: item.s_id,
-        name: item.name,
-        image: item.image
-      }]
+      items: [
+        {
+          s_id: item.s_id,
+          name: item.name,
+          image: item.image
+        }
+      ]
     })
 
     if (result.ok) {
@@ -58,14 +63,15 @@ function PlaylistDialog({ item }: PlaylistDialogProps) {
       });
       setTimeout(() => closeDialog(), 500);
     } else {
+      setErrorMessage(result.message)
       console.log({
-        from: "create playlist dialog",
-        message: "unable to create"
+        result,
       });
     }
   }
 
   const handleAdd = async (playlistId: string) => {
+    setErrorMessage("")
     const result = await addItemToPlaylist(playlistId, {
       s_id: item.s_id,
       name: item.name,
@@ -73,16 +79,7 @@ function PlaylistDialog({ item }: PlaylistDialogProps) {
     })
 
     if (result.ok) {
-      console.log({
-        from: "add item playlist dialog",
-        message: "added"
-      });
       setTimeout(() => closeDialog(), 500);
-    } else {
-      console.log({
-        from: "add item playlist dialog",
-        message: "unable to add"
-      });
     }
     closeDialog()
   }
@@ -94,13 +91,16 @@ function PlaylistDialog({ item }: PlaylistDialogProps) {
       </span>
 
       <div className="my-4 flex justify-center items-center gap-x-2">
-        <input 
-          type="text"
-          className={`grow outline-0 px-3 py-1 rounded ring-2 ${inputError ? "ring-red-400" : "ring-white/10"} focus:ring-white/40 duration-100`}
-          placeholder="New playlist"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
+        <div className="grow">
+          <Input
+            type="text"
+            placeholder="New playlist"
+            onChange={handleChange}
+            value={input}
+            error={inputError}
+          />
+        </div>
+
         <button
           className="py-1 px-5 rounded cursor-pointer bg-zinc-950/60"
           onClick={handleCreate}
@@ -109,8 +109,14 @@ function PlaylistDialog({ item }: PlaylistDialogProps) {
         </button>
       </div>
 
-      <SafeComponent errorMessage="Something went wrong loading playlists" loadingSize="medium">
-        <PlaylistList onAdd={(playlistId) => handleAdd(playlistId)} />
+      {errorMessage.length > 0 && (
+        <p className="text-red-400">
+          {errorMessage}
+        </p>
+      )}
+
+      <SafeComponent key={item.s_id} errorMessage="Something went wrong loading playlists" loadingSize="medium">
+        <PlaylistList itemId={item.s_id} onAdd={(playlistId) => handleAdd(playlistId)} />
       </SafeComponent>
     </Dialog>
   );
@@ -119,10 +125,11 @@ function PlaylistDialog({ item }: PlaylistDialogProps) {
 export default PlaylistDialog;
 
 interface PlaylistListProps {
+  itemId: string
   onAdd: (playlistId: string) => void
 }
 
-const PlaylistList = ({ onAdd } : PlaylistListProps) => {
+const PlaylistList = ({ itemId, onAdd } : PlaylistListProps) => {
   const { listPlaylists } = usePlaylists()
   const { data: playlists } = useSuspenseQuery({
     queryKey: [QUERY_KEYS.PLAYLIST_LIST],
@@ -137,7 +144,12 @@ const PlaylistList = ({ onAdd } : PlaylistListProps) => {
       </span>
       <ul className="mt-2 block">
         {playlists.map(playlist => (
-          <PlaylistRow key={playlist._id} item={playlist} onAdd={() => onAdd(playlist._id!)} />
+          <PlaylistRow
+            key={playlist._id}
+            itemId={itemId}
+            playlist={playlist}
+            onAdd={() => onAdd(playlist._id!)}
+          />
         ))}
       </ul>
     </>
@@ -145,34 +157,34 @@ const PlaylistList = ({ onAdd } : PlaylistListProps) => {
 }
 
 interface PlaylistRowProps {
-  item: Playlist
+  itemId: string
+  playlist: Playlist
   onAdd: () => void
 }
 
-const PlaylistRow = ({ item, onAdd }: PlaylistRowProps) => {
-  console.log(item);
+const PlaylistRow = ({ itemId, playlist, onAdd }: PlaylistRowProps) => {
+  const length = playlist.items.length
+  const added = playlist.items.some(track => track.s_id === itemId)
   
-  const length = item.items.length
-
   return (
     <li
-    className="px-4 py-2 rounded flex justify-between items-center hover:bg-white/5 cursor-pointer"
-    onClick={onAdd}
-  >
-    <span>
-      {item.name}
-    </span>
-    <div className="flex justify-center items-center gap-x-2">
-      {item.items.some(track => track.s_id === item._id) && (
-        <span className="text-xs text-white/30">
-          (Already added)
-        </span>
-      )}
-
-      <span className="text-white/60">
-        {length} item{length !== 1 && "s"}
+      className="px-4 py-2 rounded flex justify-between items-center hover:bg-white/5 cursor-pointer"
+      onClick={() => !added && onAdd()}
+    >
+      <span>
+        {playlist.name}
       </span>
-    </div>
-  </li>
+      <div className="flex justify-center items-center gap-x-2">
+        {added && (
+          <span className="text-xs text-white/30">
+            (Already added)
+          </span>
+        )}
+
+        <span className="text-white/60">
+          {length} item{length !== 1 && "s"}
+        </span>
+      </div>
+    </li>
   )
 }

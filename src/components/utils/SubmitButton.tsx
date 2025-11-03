@@ -2,18 +2,20 @@ import Loading from "./Loading";
 
 interface SubmitButtonProps {
   text: string
-  disabled: boolean
+  loading: boolean
+  internal?: boolean
 }
 
-function SubmitButton({ text, disabled }: SubmitButtonProps) {
+function SubmitButton({ text, loading, internal }: SubmitButtonProps) {
   return (
     <button
       type="submit"
-      className="text-center text-lg w-full h-10 rounded-full font-bold cursor-pointer flex justify-center items-center gap-x-5 outline-0 bg-black border-0 border-white/70 hover:border-t-3 hover:border-r-3 focus:border-t-3 focus:border-r-3 duration-300 disabled:bg-white/20"
-      disabled={disabled}
+      className="text-center text-lg w-full h-10 rounded font-bold cursor-pointer flex justify-center items-center gap-x-5 outline-0 bg-black border-0 border-white/70 hover:border-t-3 hover:border-r-3 focus:border-t-3 focus:border-r-3 duration-300 disabled:bg-white/20"
+      disabled={loading || internal}
     >
-      {!disabled && text}
-      {disabled && <Loading size="small" />}
+      {!loading
+        ? text
+        : <Loading size="small" />}
     </button>
   );
 }

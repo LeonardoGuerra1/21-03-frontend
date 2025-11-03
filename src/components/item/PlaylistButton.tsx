@@ -1,10 +1,10 @@
 import playlistIconBorder from "../../assets/icons/bookmark_border.svg"
 import playlistIcon from "../../assets/icons/bookmark.svg"
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PlaylistDialog from "./PlaylistDialog";
 import { Track } from "../../models/Track";
 import { useDialogStore } from "../../stores/useDialogStore";
-import { Action, FEEDER_LIFE_MS, FEEDER_STATUS, FeederStatus } from "../../constants";
+import { DialogAction, FEEDER_LIFE_MS, FEEDER_STATUS, FeederStatus } from "../../constants";
 import Feeder from "../utils/Feeder";
 import { useAuthStore } from "../../stores/useAuthStore";
 
@@ -20,7 +20,9 @@ function PlaylistButton({ item }: PlaylistButtonProps) {
 
   const openDialog = useDialogStore().openDialog
   const action = useDialogStore().action
-  const compare: Action = useMemo(() => ({ type: "playlist", id: item.s_id }), [])
+  const itemAction = useRef<DialogAction>({
+    type: "playlist", id: item.s_id
+  })
 
   const handleClick = () => {
     if (!logged) {
@@ -28,8 +30,7 @@ function PlaylistButton({ item }: PlaylistButtonProps) {
       setTimeout(() => setOpenFeeder(false), FEEDER_LIFE_MS);
       return
     }
-
-    openDialog(compare)
+    openDialog(itemAction.current)
   }
 
     useEffect(() => {
@@ -40,9 +41,14 @@ function PlaylistButton({ item }: PlaylistButtonProps) {
   return (
     <>
       <div className="relative">
-        <button className="cursor-pointer" onClick={handleClick}>
+        <button
+          className="flex justify-center items-center cursor-pointer"
+          onClick={handleClick}
+          disabled={feederStatus !== "idle"}
+        >
           <img src={added ? playlistIcon : playlistIconBorder} alt="Playlist button" />
         </button>
+
         <Feeder
           key={item.id}
           open={openFeeder}
@@ -50,7 +56,7 @@ function PlaylistButton({ item }: PlaylistButtonProps) {
           position="top"
         />
       </div>
-      {action === compare && <PlaylistDialog item={item} /> }
+      {action === itemAction.current && <PlaylistDialog item={item} /> }
     </>
   );
 }
